@@ -1,4 +1,4 @@
-from app.utils.scores import score_matrix
+from app.utils.scores import score_matrix, sorter
 from app.utils.format_scores import format_scores, format_results
 
 
@@ -26,8 +26,8 @@ def winner_of_hand(game_count: int, game: dict) -> list:
     :param game The game
     :type game dict
     """
-    player_a_cards = game["playerA"]
-    player_b_cards = game["playerB"]
+    player_a_cards = sorted(game["playerA"], key=sorter, reverse=True)
+    player_b_cards = sorted(game["playerB"], key=sorter, reverse=True)
 
     player_a_score = get_player_score(player_a_cards)
     player_b_score = get_player_score(player_b_cards)
@@ -45,7 +45,7 @@ def winner_of_hand(game_count: int, game: dict) -> list:
         return format_scores(game_count, player_a_score, player_b_score, "Player A")
 
     if player_a_score == player_b_score:
-        return tie_breaker(game_count, player_a_cards, player_b_cards)
+        return tie_breaker(game_count, player_a_cards, player_a_score, player_b_cards, player_b_score)
 
 
 def get_player_score(cards: list) -> int:
@@ -63,6 +63,18 @@ def get_player_score(cards: list) -> int:
     return total_score
 
 
-def tie_breaker(game_count: int, player_a_cards: list, player_b_cards: list) -> list:
-    # return format_scores(player_a_score, player_b_score, "Player A Wins")
+def tie_breaker(game_count: int, player_a_cards: list, player_a_score: int, player_b_cards: list,
+                player_b_score: int) -> list:
+    for card_a in player_a_cards:
+        for card_b in player_b_cards:
+
+            # evaluate highest single value card
+            if card_a[:-1] > card_b[:-1]:
+                return format_scores(game_count, player_a_score, player_b_score,
+                                     f"Player A \n ({card_a[:-1]} is higher than {card_b[:-1]})")
+
+            if card_b[:-1] > card_a[:-1]:
+                return format_scores(game_count, player_a_score, player_b_score,
+                                     f"Player B \n ({card_b[:-1]} is higher than {card_a[:-1]})")
+
     pass
