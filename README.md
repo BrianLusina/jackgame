@@ -1,4 +1,4 @@
-# YocoJack
+# Game of Jacks
 
 Simple card game
 
